@@ -1,10 +1,10 @@
 package data;
 
-public class SubTask extends Task {
+public class Subtask extends Task {
     private int epicId;
 
-    public SubTask(int id, String name, String description, int epicId) {
-        super(id, name, description, Status.NEW);
+    public Subtask(String name, String description, int epicId) {
+        super(name, description);
         this.epicId = epicId;
     }
 
@@ -20,9 +20,9 @@ public class SubTask extends Task {
     public String toString() {
         return "Subtask{\n" +
                 " ID = " + getId() + ",\n" +
-                " nam = '" + getName() + ",\n" +
-                " description = '" + getDescription() + ",\n" +
-                " status = " + getStatus() + ",\n" +
+                " name = '" + getName() + "',\n" +
+                " description = '" + getDescription() + "',\n" +
+                " status = '" + getStatus() + "',\n" +
                 '}';
     }
 }
