@@ -1,6 +1,8 @@
 package data;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+
 
 public class Epic extends Task {
     private ArrayList<Integer> epicId = new ArrayList<>();
@@ -10,15 +12,22 @@ public class Epic extends Task {
     }
 
     public ArrayList<Integer> getEpicsId() {
-        return epicId;
+        return new ArrayList<>(epicId); // возвращаем копию
     }
 
     public void addEpicIds(int id) {
-        this.epicId.add(id);
+        if (!epicId.contains(id)) {
+            epicId.add(id);
+        }
     }
 
     public void removeSubtaskId(int id) {
-        this.epicId.remove(id);
+        Iterator<Integer> iterator = epicId.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next() == id) {
+                iterator.remove();
+            }
+        }
     }
 
     @Override
