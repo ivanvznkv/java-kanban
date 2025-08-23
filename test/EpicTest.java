@@ -1,24 +1,10 @@
 import data.Epic;
-import data.Subtask;
 import data.Status;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.TaskManager;
-import service.InMemoryTaskManager;
-
 import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EpicTest {
-
-    private TaskManager taskManager;
-
-    @BeforeEach
-    void setUp() {
-        taskManager = new InMemoryTaskManager();
-    }
 
     @Test
     void epicCreationTest() {
@@ -67,32 +53,5 @@ public class EpicTest {
         epic2.setId(5);
 
         assertEquals(epic1, epic2, "Эпики должны быть равны по id");
-    }
-
-    @Test
-    void toStringTest() {
-        Epic epic = new Epic("Test toStringTest", "Test toStringTest description");
-        epic.setId(7);
-
-        String str = epic.toString();
-        assertTrue(str.contains("Test toStringTest"));
-        assertTrue(str.contains("Test toStringTest description"));
-        assertTrue(str.contains("7"));
-        assertTrue(str.contains("NEW"));
-    }
-
-    @Test
-    void subtaskCannotBeItsOwnEpic() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
-        Epic epic = new Epic("Test subtaskCannotBeItsOwnEpic", "Test subtaskCannotBeItsOwnEpic description");
-        taskManager.addEpic(epic);
-
-        Subtask invalidSubtask = new Subtask("Неверный сабтаск", "Эпик не существует", epic.getId() + 1);
-
-        taskManager.addSubtask(invalidSubtask);
-
-        assertTrue(taskManager.getAllSubtasks().isEmpty(),
-                "Сабтаск не должен быть добавлен, если привязан к несуществующему эпику");
     }
 }

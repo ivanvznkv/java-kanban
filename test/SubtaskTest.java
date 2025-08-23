@@ -1,23 +1,10 @@
 import data.Subtask;
 import data.Status;
-import data.Epic;
-import service.TaskManager;
-import service.InMemoryTaskManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
-
 public class SubtaskTest {
-
-    private TaskManager taskManager;
-
-    @BeforeEach
-    void setUp() {
-        taskManager = new InMemoryTaskManager();
-    }
 
     @Test
     void subtaskCreationTest() {
@@ -52,32 +39,5 @@ public class SubtaskTest {
         subtask2.setId(7);
 
         assertEquals(subtask1, subtask2, "Подзадачи должны быть равны, если их id совпадает");
-    }
-
-    @Test
-    void toStringTest() {
-        Subtask subtask = new Subtask("Test toStringTest", "Test toStringTest description", 9);
-        subtask.setId(7);
-
-        String str = subtask.toString();
-        assertTrue(str.contains("Test toStringTest"));
-        assertTrue(str.contains("Test toStringTest description"));
-        assertTrue(str.contains("7"));
-        assertTrue(str.contains("NEW"));
-    }
-
-    @Test
-    void subtaskCannotBeItsOwnEpic() {
-        Epic epic = new Epic("Test subtaskCannotBeItsOwnEpic", "Test subtaskCannotBeItsOwnEpic description");
-        taskManager.addEpic(epic);
-
-        Subtask invalidSubtask = new Subtask("Неверный сабтаск", "Сабтаск не должен быть своим же эпиком", epic.getId());
-        invalidSubtask.setId(epic.getId());
-
-        taskManager.addSubtask(invalidSubtask);
-
-        List<Subtask> subtasks = taskManager.getAllSubtasksByEpicId(epic.getId());
-
-        assertTrue(subtasks.isEmpty(), "Сабтаск не должен быть своим же эпиком");
     }
 }

@@ -42,4 +42,20 @@ public class InMemoryHistoryManagerTest {
         assertEquals("Обновленное описание", secondVersion.getDescription(), "Описание второй версии должно быть обновленным");
         assertEquals(Status.IN_PROGRESS, secondVersion.getStatus(), "Статус второй версии должен быть IN_PROGRESS");
     }
+
+    @Test
+    void historyDoesNotExceedTenTasks() {
+        for (int i = 1; i <= 11; i++) {
+            Task task = new Task("Test historyDoesNotExceedTenTasks task " + i, "Test historyDoesNotExceedTenTasks description " + i);
+            historyManager.add(task);
+        }
+
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(10, history.size(), "В истории не должно быть больше 10 задач");
+
+        for (int i = 0; i < 10; i++) {
+            assertEquals("Test historyDoesNotExceedTenTasks task " + (i + 2), history.get(i).getName());
+        }
+    }
 }
