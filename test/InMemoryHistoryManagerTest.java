@@ -120,5 +120,4 @@ public class InMemoryHistoryManagerTest {
         List<Task> history = historyManager.getHistory();
         assertEquals("Обновленное имя", history.get(0).getName(), "История должна хранить ссылку на задачу, новое имя должно отразиться");
     }
-
 }
