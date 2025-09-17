@@ -72,12 +72,7 @@ public class InMemoryHistoryManagerTest {
         historyManager.add(task3);
         historyManager.add(task2);
 
-        List<Task> history = historyManager.getHistory();
-        assertEquals(3, history.size(), "В истории должно быть 3 задачи");
-        assertEquals(task1, history.get(0), "На первом месте должна быть task1");
-        assertEquals(task3, history.get(1), "На втором месте должна быть task3");
-        assertEquals(task2, history.get(2), "На последнем месте должна быть task2");
-
+        assertEquals(List.of(task1, task3, task2), historyManager.getHistory());
     }
 
     @Test
@@ -119,5 +114,59 @@ public class InMemoryHistoryManagerTest {
 
         List<Task> history = historyManager.getHistory();
         assertEquals("Обновленное имя", history.get(0).getName(), "История должна хранить ссылку на задачу, новое имя должно отразиться");
+    }
+
+    @Test
+    void removeFromBeginningRemovesCorrectly() {
+        Task task1 = new Task("Test removeFromBeginningRemovesCorrectly task1", "Test removeFromBeginningRemovesCorrectly task1 description");
+        task1.setId(1);
+        Task task2 = new Task("Test removeFromBeginningRemovesCorrectly task2", "Test removeFromBeginningRemovesCorrectly task2 description");
+        task2.setId(2);
+        Task task3 = new Task("Test removeFromBeginningRemovesCorrectly task3", "Test removeFromBeginningRemovesCorrectly task3 description");
+        task3.setId(3);
+
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(task1.getId());
+        List<Task> history = historyManager.getHistory();
+        assertEquals(List.of(task2, task3), history, "После удаления задачи должны остаться task2 и task3");
+    }
+
+    @Test
+    void removeFromMiddleRemovesCorrectly() {
+        Task task1 = new Task("Test removeFromMiddleRemovesCorrectly task1", "Test removeFromMiddleRemovesCorrectly task1 description");
+        task1.setId(1);
+        Task task2 = new Task("Test removeFromMiddleRemovesCorrectly task2", "Test removeFromMiddleRemovesCorrectly task2 description");
+        task2.setId(2);
+        Task task3 = new Task("Test removeFromMiddleRemovesCorrectly task3", "Test removeFromMiddleRemovesCorrectly task3 description");
+        task3.setId(3);
+
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(task2.getId());
+        List<Task> history = historyManager.getHistory();
+        assertEquals(List.of(task1, task3), history, "После удаления задачи должны остаться task1 и task3");
+    }
+
+    @Test
+    void removeFromEndRemovesCorrectly() {
+        Task task1 = new Task("Test removeFromEndRemovesCorrectly task1", "Test removeFromEndRemovesCorrectly task1 description");
+        task1.setId(1);
+        Task task2 = new Task("Test removeFromEndRemovesCorrectly task2", "Test removeFromEndRemovesCorrectly task2 description");
+        task2.setId(2);
+        Task task3 = new Task("Test removeFromEndRemovesCorrectly task3", "Test removeFromEndRemovesCorrectly task3 description");
+        task3.setId(3);
+
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(task3.getId());
+        List<Task> history = historyManager.getHistory();
+        assertEquals(List.of(task1, task2), history, "После удаления задачи должны остаться task1 и task2");
     }
 }
