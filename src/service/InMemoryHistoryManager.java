@@ -1,5 +1,3 @@
-// Сергей, добрый день! Код на проверку)
-
 package service;
 
 import data.Task;
@@ -25,7 +23,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public ArrayList<Task> getHistory() { // new
+    public ArrayList<Task> getHistory() {
         return getTasks();
     }
 
