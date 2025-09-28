@@ -8,11 +8,11 @@ public class Epic extends Task {
     private ArrayList<Integer> epicId = new ArrayList<>();
 
     public Epic(String name, String description) {
-        super(name, description);
+        super(name, description, TaskType.EPIC);
     }
 
     public ArrayList<Integer> getEpicsId() {
-        return new ArrayList<>(epicId); // возвращаем копию
+        return new ArrayList<>(epicId);
     }
 
     public void addEpicIds(int id) {

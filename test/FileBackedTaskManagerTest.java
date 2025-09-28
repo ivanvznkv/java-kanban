@@ -21,6 +21,15 @@ public class FileBackedTaskManagerTest {
     public void setUp() throws IOException {
         testFile = File.createTempFile("tasks", ".csv");
         fileBackedTaskManager = new FileBackedTaskManager(testFile);
+
+        Task task1 = new Task("Task1", "Task1 description");
+        fileBackedTaskManager.addTask(task1);
+
+        Epic epic1 = new Epic("Epic1", "Epic1 description");
+        fileBackedTaskManager.addEpic(epic1);
+
+        Subtask subtask1 = new Subtask("Subtask1", "Subtask1 description", epic1.getId());
+        fileBackedTaskManager.addSubtask(subtask1);
     }
 
     @Test
@@ -36,15 +45,6 @@ public class FileBackedTaskManagerTest {
 
     @Test
     void saveMultipleTasksToFile() throws IOException {
-        Task task1 = new Task("Task1", "Task1 description");
-        fileBackedTaskManager.addTask(task1);
-
-        Epic epic1 = new Epic("Epic1", "Epic1 description");
-        fileBackedTaskManager.addEpic(epic1);
-
-        Subtask subtask1 = new Subtask("Subtask1", "Subtask1 description", epic1.getId());
-        fileBackedTaskManager.addSubtask(subtask1);
-
         List<String> lines = Files.readAllLines(testFile.toPath());
         assertEquals("id,type,name,status,description,epic", lines.get(0));
 
@@ -57,58 +57,47 @@ public class FileBackedTaskManagerTest {
 
     @Test
     void loadFromFileRestoresAllTasks() {
-        Task task1 = new Task("Task1", "Task1 description");
-        fileBackedTaskManager.addTask(task1);
-        Epic epic1 = new Epic("Epic1", "Epic1 description");
-        fileBackedTaskManager.addEpic(epic1);
-        Subtask subtask1 = new Subtask("Subtask1", "Subtask1 description", epic1.getId());
-        fileBackedTaskManager.addSubtask(subtask1);
+        List<Task> originalTasks = fileBackedTaskManager.getAllTasks();
+        List<Epic> originalEpics = fileBackedTaskManager.getAllEpics();
+        List<Subtask> originalSubtasks = fileBackedTaskManager.getAllSubtasks();
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(testFile);
 
-        assertEquals(1, loadedManager.getAllTasks().size());
-        assertEquals(1, loadedManager.getAllEpics().size());
-        assertEquals(1, loadedManager.getAllSubtasks().size());
+        assertEquals(originalTasks.size(), loadedManager.getAllTasks().size());
+        assertEquals(originalEpics.size(), loadedManager.getAllEpics().size());
+        assertEquals(originalSubtasks.size(), loadedManager.getAllSubtasks().size());
+
+        assertIterableEquals(originalTasks, loadedManager.getAllTasks(), "Таски не совпадают");
+        assertIterableEquals(originalEpics, loadedManager.getAllEpics(), "Эпики не совпадают");
+        assertIterableEquals(originalSubtasks, loadedManager.getAllSubtasks(), "Сабтаски не совпадают");
     }
 
     @Test
     void nextTaskIdAfterLoad() throws IOException {
-        Task task1 = new Task("Task1", "Task1 description");
-        Task task2 = new Task("Task2", "Task2 description");
-        fileBackedTaskManager.addTask(task1);
-        fileBackedTaskManager.addTask(task2);
-
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(testFile);
 
         Task newTask = new Task("Task3", "Task3 description");
         loaded.addTask(newTask);
 
-        assertEquals(3, newTask.getId());
+        assertEquals(4, newTask.getId(), "Новая задача должна получить следующий id после загрузки");
     }
 
     @Test
     void removeAllAndByIdUpdatesFile() throws IOException {
-        Task task = new Task("Task1", "Task1 description");
-        fileBackedTaskManager.addTask(task);
-
-        fileBackedTaskManager.removeTaskById(task.getId());
+        fileBackedTaskManager.removeTaskById(fileBackedTaskManager.getAllTasks().get(0).getId());
 
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(testFile);
-        assertTrue(loaded.getAllTasks().isEmpty(), "После удаления задача должна исчезнуть");
+        assertEquals(0, loaded.getAllTasks().size(), "После удаления задача должна исчезнуть");
 
-        // проверим полное удаление
-        Task task2 = new Task("Task2", "Task2 description");
-        fileBackedTaskManager.addTask(task2);
         fileBackedTaskManager.removeAllTasks();
-
         loaded = FileBackedTaskManager.loadFromFile(testFile);
         assertTrue(loaded.getAllTasks().isEmpty(), "После removeAllTasks файл должен быть пуст");
     }
 
+
     @Test
     void updateTasksUpdatesFile() {
-        Task task = new Task("Task1", "Task1 description");
-        fileBackedTaskManager.addTask(task);
+        Task task = fileBackedTaskManager.getAllTasks().get(0);
 
         task.setName("NewName");
         task.setDescription("NewDesc");
