@@ -8,8 +8,6 @@ import data.Task;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.List;
-import java.util.ArrayList;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File saveFile;
