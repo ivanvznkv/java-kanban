@@ -7,13 +7,11 @@ public class Task {
     private String name;
     private String description;
     private Status status;
-    private TaskType type;
 
     public Task(String name, String description, TaskType type) {
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
-        this.type = type;
     }
 
     public Task(Task other) {
@@ -21,7 +19,6 @@ public class Task {
         this.name = other.name;
         this.description = other.description;
         this.status = other.status;
-        this.type = other.type;
     }
 
     public Task(String name, String description) {
@@ -61,7 +58,7 @@ public class Task {
     }
 
     public TaskType getType() {
-        return type;
+        return TaskType.TASK;
     }
 
     @Override
