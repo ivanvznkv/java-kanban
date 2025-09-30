@@ -12,7 +12,7 @@ public class Epic extends Task {
     }
 
     public ArrayList<Integer> getEpicsId() {
-        return new ArrayList<>(epicId); // возвращаем копию
+        return new ArrayList<>(epicId);
     }
 
     public void addEpicIds(int id) {
@@ -28,6 +28,11 @@ public class Epic extends Task {
                 iterator.remove();
             }
         }
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
     }
 
     @Override
