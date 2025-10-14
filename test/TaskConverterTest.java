@@ -3,6 +3,8 @@ import data.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskConverterTest {
@@ -58,7 +60,7 @@ public class TaskConverterTest {
 
     @Test
     void testFromStringTask() {
-        String csv = "1,TASK,Task1,NEW,Task1 description,";
+        String csv = "1,TASK,Task1,NEW,Task1 description,,,";
         Task task = TaskConverter.fromString(csv);
 
         assertEquals(1, task.getId());
@@ -66,11 +68,13 @@ public class TaskConverterTest {
         assertEquals("Task1", task.getName());
         assertEquals("Task1 description", task.getDescription());
         assertEquals(Status.NEW, task.getStatus());
+        assertEquals(Duration.ZERO, task.getDuration(), "Duration для задачи без значения должен быть Duration.ZERO");
+        assertNull(task.getStartTime(), "StartTime для задачи без значения должен быть null");
     }
 
     @Test
     void testFromStringEpic() {
-        String csv = "2,EPIC,Epic1,IN_PROGRESS,Epic1 description,";
+        String csv = "2,EPIC,Epic1,IN_PROGRESS,Epic1 description,,,";
         Epic epic = (Epic) TaskConverter.fromString(csv);
 
         assertEquals(2, epic.getId());
@@ -82,7 +86,7 @@ public class TaskConverterTest {
 
     @Test
     void testFromStringSubtask() {
-        String csv = "3,SUBTASK,Subtask1,DONE,Subtask1 description,10";
+        String csv = "3,SUBTASK,Subtask1,DONE,Subtask1 description,,," + "10";
         Subtask subtask = (Subtask) TaskConverter.fromString(csv);
 
         assertEquals(3, subtask.getId());

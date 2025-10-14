@@ -5,6 +5,8 @@ import data.Subtask;
 import data.Task;
 
 import java.util.ArrayList;
+import java.util.Set;
+
 
 public interface TaskManager {
     // методы add
@@ -52,4 +54,10 @@ public interface TaskManager {
     void removeSubtaskById(int id);
 
     ArrayList<Task> getHistory();
+
+    Set<Task> getPrioritizedTasks();
+
+    boolean isIntersect(Task task1, Task task2);
+
+    boolean hasIntersection(Task task);
 }

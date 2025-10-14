@@ -1,11 +1,11 @@
 package data;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
+import java.util.*;
+import java.time.*;
 
 public class Epic extends Task {
     private ArrayList<Integer> epicId = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
         super(name, description);
@@ -30,6 +30,25 @@ public class Epic extends Task {
         }
     }
 
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public Duration getDuration() {
+        return super.getDuration();
+    }
+
+    @Override
+    public LocalDateTime getStartTime() {
+        return super.getStartTime();
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
     @Override
     public TaskType getType() {
         return TaskType.EPIC;
@@ -42,6 +61,9 @@ public class Epic extends Task {
                 " name = '" + getName() + "',\n" +
                 " description = '" + getDescription() + "',\n" +
                 " status = '" + getStatus() + "',\n" +
+                " startTime = " + getStartTime() + ",\n" +
+                " duration = " + getDuration() + ",\n" +
+                " endTime = " + getEndTime() + "\n" +
                 '}';
     }
 }

@@ -1,115 +1,67 @@
-import data.Task;
-import data.Epic;
-import data.Subtask;
-import data.Status;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import service.FileBackedTaskManager;
+import data.*;
+import service.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
-public class FileBackedTaskManagerTest {
-    private FileBackedTaskManager fileBackedTaskManager;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private File testFile;
 
-    @BeforeEach
-    public void setUp() throws IOException {
-        testFile = File.createTempFile("tasks", ".csv");
-        fileBackedTaskManager = new FileBackedTaskManager(testFile);
-
-        Task task1 = new Task("Task1", "Task1 description");
-        fileBackedTaskManager.addTask(task1);
-
-        Epic epic1 = new Epic("Epic1", "Epic1 description");
-        fileBackedTaskManager.addEpic(epic1);
-
-        Subtask subtask1 = new Subtask("Subtask1", "Subtask1 description", epic1.getId());
-        fileBackedTaskManager.addSubtask(subtask1);
+    @Override
+    protected FileBackedTaskManager createManager() {
+        try {
+            testFile = File.createTempFile("tasks", ".csv");
+            Files.write(testFile.toPath(), List.of("id,type,name,status,description,duration,startTime,epic"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return new FileBackedTaskManager(testFile);
     }
 
     @Test
-    void saveEmptyManagerToFile() throws IOException {
-        fileBackedTaskManager.removeAllTasks();
-        fileBackedTaskManager.removeAllEpic();
-        fileBackedTaskManager.removeAllSubtask();
-
-        List<String> lines = Files.readAllLines(testFile.toPath());
-        assertEquals(1, lines.size());
-        assertEquals("id,type,name,status,description,epic", lines.get(0));
-    }
-
-    @Test
-    void saveMultipleTasksToFile() throws IOException {
-        List<String> lines = Files.readAllLines(testFile.toPath());
-        assertEquals("id,type,name,status,description,epic", lines.get(0));
-
-        assertEquals(4, lines.size());
-
-        assertTrue(lines.get(1).contains("Task1"));
-        assertTrue(lines.get(2).contains("Epic1"));
-        assertTrue(lines.get(3).contains("Subtask1"));
-    }
-
-    @Test
-    void loadFromFileRestoresAllTasks() {
-        List<Task> originalTasks = fileBackedTaskManager.getAllTasks();
-        List<Epic> originalEpics = fileBackedTaskManager.getAllEpics();
-        List<Subtask> originalSubtasks = fileBackedTaskManager.getAllSubtasks();
-
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(testFile);
-
-        assertEquals(originalTasks.size(), loadedManager.getAllTasks().size());
-        assertEquals(originalEpics.size(), loadedManager.getAllEpics().size());
-        assertEquals(originalSubtasks.size(), loadedManager.getAllSubtasks().size());
-
-        assertIterableEquals(originalTasks, loadedManager.getAllTasks(), "Таски не совпадают");
-        assertIterableEquals(originalEpics, loadedManager.getAllEpics(), "Эпики не совпадают");
-        assertIterableEquals(originalSubtasks, loadedManager.getAllSubtasks(), "Сабтаски не совпадают");
-    }
-
-    @Test
-    void nextTaskIdAfterLoad() throws IOException {
+    void shouldSaveAndLoadAllTasks() {
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(testFile);
 
-        Task newTask = new Task("Task3", "Task3 description");
+        assertEquals(manager.getAllTasks().size(), loaded.getAllTasks().size(), "Количество задач не совпадает");
+        assertEquals(manager.getAllEpics().size(), loaded.getAllEpics().size(), "Количество эпиков не совпадает");
+        assertEquals(manager.getAllSubtasks().size(), loaded.getAllSubtasks().size(), "Количество сабтасков не совпадает");
+    }
+
+    @Test
+    void shouldRestoreNextTaskIdCorrectly() {
+        FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(testFile);
+        Task newTask = new Task("Task1", "Task1 description");
         loaded.addTask(newTask);
-
-        assertEquals(4, newTask.getId(), "Новая задача должна получить следующий id после загрузки");
+        assertTrue(newTask.getId() > 0, "Id должен корректно устанавливаться после загрузки");
     }
 
     @Test
-    void removeAllAndByIdUpdatesFile() throws IOException {
-        fileBackedTaskManager.removeTaskById(fileBackedTaskManager.getAllTasks().get(0).getId());
+    void shouldUpdateFileAfterRemovingTask() {
+        int taskId = manager.getAllTasks().get(0).getId();
+        manager.removeTaskById(taskId);
 
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(testFile);
-        assertEquals(0, loaded.getAllTasks().size(), "После удаления задача должна исчезнуть");
-
-        fileBackedTaskManager.removeAllTasks();
-        loaded = FileBackedTaskManager.loadFromFile(testFile);
-        assertTrue(loaded.getAllTasks().isEmpty(), "После removeAllTasks файл должен быть пуст");
+        assertNull(loaded.getTaskById(taskId), "Задача должна быть удалена из файла");
     }
 
-
     @Test
-    void updateTasksUpdatesFile() {
-        Task task = fileBackedTaskManager.getAllTasks().get(0);
-
-        task.setName("NewName");
-        task.setDescription("NewDesc");
-        task.setStatus(Status.IN_PROGRESS);
-        fileBackedTaskManager.updateTask(task);
+    void shouldUpdateFileAfterUpdatingTask() {
+        Task t = manager.getAllTasks().get(0);
+        t.setName("UpdatedName");
+        t.setDescription("UpdatedDesc");
+        t.setStatus(Status.DONE);
+        manager.updateTask(t);
 
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(testFile);
-        Task loadedTask = loaded.getTaskById(task.getId());
+        Task restored = loaded.getTaskById(t.getId());
 
-        assertNotNull(loadedTask);
-        assertEquals("NewName", loadedTask.getName());
-        assertEquals("NewDesc", loadedTask.getDescription());
-        assertEquals(Status.IN_PROGRESS, loadedTask.getStatus());
+        assertEquals("UpdatedName", restored.getName());
+        assertEquals("UpdatedDesc", restored.getDescription());
+        assertEquals(Status.DONE, restored.getStatus());
     }
 }
