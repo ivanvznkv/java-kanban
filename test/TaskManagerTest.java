@@ -281,18 +281,4 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         assertFalse(prioritized.contains(epic), "Epic не должен входить в приоритетные задачи, так как у него нет времени");
     }
-
-    @Test
-    void isIntersectDetectsCorrectly() {
-        Task overlappingTask = new Task("Overlap Task", "Пересекается с subtask1");
-        overlappingTask.setStartTime(LocalDateTime.of(2025, 10, 11, 11, 30));
-        overlappingTask.setDuration(Duration.ofHours(1));
-
-        Task nonOverlappingTask = new Task("Non-overlap Task", "Не пересекается ни с чем");
-        nonOverlappingTask.setStartTime(LocalDateTime.of(2025, 10, 11, 18, 0));
-        nonOverlappingTask.setDuration(Duration.ofHours(1));
-
-        assertTrue(manager.isIntersect(overlappingTask, subtask1), "Пересекающиеся задачи должны возвращать true");
-        assertFalse(manager.isIntersect(nonOverlappingTask, task), "Непересекающиеся задачи должны возвращать false");
-    }
 }

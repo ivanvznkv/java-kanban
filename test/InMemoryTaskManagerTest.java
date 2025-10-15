@@ -149,4 +149,21 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         assertEquals(Duration.ofMinutes(180), updatedEpic.getDuration(), "Неверная суммарная продолжительность эпика");
         assertEquals(LocalDateTime.of(2025, 1, 1, 10, 0), updatedEpic.getStartTime(), "Неверное время начала эпика");
     }
+
+    @Test
+    void overlappingTaskShouldNotBeAdded() {
+        int initialTaskCount = manager.getAllTasks().size();
+
+        Task task1 = new Task("Task1", "Первая задача");
+        task1.setStartTime(LocalDateTime.of(2025, 10, 11, 9, 0));
+        task1.setDuration(Duration.ofHours(2));
+        manager.addTask(task1);
+
+        Task overlappingTask = new Task("Overlap Task", "Пересекается с Task1");
+        overlappingTask.setStartTime(LocalDateTime.of(2025, 10, 11, 10, 0));
+        overlappingTask.setDuration(Duration.ofHours(1));
+        manager.addTask(overlappingTask);
+
+        assertEquals(initialTaskCount + 1, manager.getAllTasks().size(), "Пересекающаяся задача не должна добавляться");
+    }
 }
