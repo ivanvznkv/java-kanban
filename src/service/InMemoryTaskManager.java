@@ -124,8 +124,10 @@ public class InMemoryTaskManager implements TaskManager {
     // методы удаления всех задач одного типа
     @Override
     public void removeAllTasks() {
+        for (Task task : tasks.values()) {
+            prioritizedTasks.remove(task);
+        }
         tasks.clear();
-        prioritizedTasks.clear();
         System.out.println("Все задачи удалены");
     }
 
@@ -202,9 +204,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        if (oldSubtask.getStartTime() != null) {
-            prioritizedTasks.remove(oldSubtask);
-        }
+        prioritizedTasks.remove(oldSubtask);
 
         oldSubtask.setName(subtask.getName());
         oldSubtask.setDescription(subtask.getDescription());
@@ -212,9 +212,7 @@ public class InMemoryTaskManager implements TaskManager {
         oldSubtask.setStartTime(subtask.getStartTime());
         oldSubtask.setDuration(subtask.getDuration());
 
-        if (oldSubtask.getStartTime() != null) {
-            prioritizedTasks.add(oldSubtask);
-        }
+        prioritizedTasks.add(oldSubtask);
 
         updateEpicStatus(subtask.getEpicId());
         updateEpicTime(epics.get(subtask.getEpicId()));
@@ -239,7 +237,10 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(id);
         if (epic != null) {
             for (Integer subtasksId : epic.getEpicsId()) {
-                subtasks.remove(subtasksId);
+                Subtask subtask = subtasks.remove(subtasksId);
+                if (subtask != null) {
+                    prioritizedTasks.remove(subtask);
+                }
             }
             epics.remove(epic.getId());
             System.out.println("Эпик с ID " + id + " и его подзадачи удалены");
