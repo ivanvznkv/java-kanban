@@ -1,10 +1,9 @@
 package service;
 
-import data.Epic;
-import data.Subtask;
-import data.Task;
+import data.*;
 
-import java.util.ArrayList;
+import java.util.*;
+
 
 public interface TaskManager {
     // методы add
@@ -52,4 +51,6 @@ public interface TaskManager {
     void removeSubtaskById(int id);
 
     ArrayList<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }

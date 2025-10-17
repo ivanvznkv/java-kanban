@@ -91,7 +91,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         try (BufferedWriter bw = Files.newBufferedWriter(saveFile.toPath(), StandardCharsets.UTF_8)) {
-            bw.write("id,type,name,status,description,epic");
+            bw.write("id,type,name,status,description,duration,startTime,epic");
             bw.newLine();
 
             for (Task task : getAllTasks()) {
